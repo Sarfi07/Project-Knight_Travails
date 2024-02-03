@@ -19,7 +19,7 @@ function isVisited(node, array) {
 
 // searching the fastest route
 
-function knightMoves(start, end, queue = [new Node(start)], visitedNodes = [[start]]) {
+function knightMoves(start, end, queue = [Node(start)], visitedNodes = [[start]]) {
     // possible moves
     const possibleMoves = [
         [1, 2], [1, -2],
@@ -29,30 +29,32 @@ function knightMoves(start, end, queue = [new Node(start)], visitedNodes = [[sta
     ]
 
     // base case
-    if (start[0] === end[0] && start[1] === end[1]) return printMoves(start, queue.shift());
+    if (start[0] === end[0] && start[1] === end[1]) return queue.shift();
 
+    // check for empty queue
     if (!queue.length) return;
 
-    const currentPosition = queue.shift();
+    while (queue.length) {
+        const currentPos = queue.shift();
 
-    possibleMoves.forEach(move => {
-        const newX = move[0] + currentPosition.data[0];
-        const newY = move[1] + currentPosition.data[1];
+        for (const move of possibleMoves) {
+            const newX = move[0] + currentPos.data[0];
+            const newY = move[1] + currentPos.data[1];
 
-        // check if newPosition is out of bound
-        if (newX < 0 || newX > 7 && newY < 0 || newY > 7) return;
+            if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
+                const newPos = Node([newX, newY]);
+                newPos.path = currentPos.path.concat(newPos.path);
 
-        // make new position node
-        const newPosition = Node([newX, newY]);
 
-        if (!isVisited(newPosition, visitedNodes)) {
-            queue.push(newPosition);
-            
-            newPosition.path = currentPosition.path.concat(newPosition.path);
+                if (end[0] === newX && end[1] === newY) return printMoves(start, newPos);
+
+                if (!isVisited(newPos, visitedNodes)) {
+                    visitedNodes.push(newPos);
+                    queue.push(newPos);
+                }
+            }
         }
-    })
-
-    return knightMoves(queue[0].data, end, queue, visitedNodes)
+    }
 }
 
 function printMoves(start, node) {
@@ -67,4 +69,4 @@ function printMoves(start, node) {
 }
 
 
-console.log(knightMoves([0, 0], [3, 3]));
+console.log(knightMoves([0, 0], [4, 5]));
