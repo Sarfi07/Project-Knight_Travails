@@ -7,19 +7,9 @@ function Node(data, path=[[data]]) {
 }
 
 
-// a tree representing all the possible move
-function isVisited(node, array) {
-    array.forEach(element => {
-        if (element[0] === node.data[0] && element[1] === node.data[1]) return true;
-    })
-
-    array.push([node.x, node.y]);
-    return false;
-}
-
 // searching the fastest route
 
-function knightMoves(start, end, queue = [Node(start)], visitedNodes = [[start]]) {
+function knightMoves(start, end, queue = [Node(start)], visitedNodes = {}) {
     // possible moves
     const possibleMoves = [
         [1, 2], [1, -2],
@@ -37,6 +27,7 @@ function knightMoves(start, end, queue = [Node(start)], visitedNodes = [[start]]
     while (queue.length) {
         const currentPos = queue.shift();
 
+        // used for of because using forEach was not terminating the while correctly
         for (const move of possibleMoves) {
             const newX = move[0] + currentPos.data[0];
             const newY = move[1] + currentPos.data[1];
@@ -45,11 +36,13 @@ function knightMoves(start, end, queue = [Node(start)], visitedNodes = [[start]]
                 const newPos = Node([newX, newY]);
                 newPos.path = currentPos.path.concat(newPos.path);
 
+                const posKey = `${newX},${newY}`;
 
-                if (end[0] === newX && end[1] === newY) return printMoves(start, newPos);
+                if (posKey === `${end[0]},${end[1]}`) return printMoves(start, newPos);
 
-                if (!isVisited(newPos, visitedNodes)) {
-                    visitedNodes.push(newPos);
+                // using hash for constant time complexity in checking visited Nodes;
+                if (!visitedNodes[posKey]) {
+                    visitedNodes.posKey = true;
                     queue.push(newPos);
                 }
             }
@@ -69,4 +62,4 @@ function printMoves(start, node) {
 }
 
 
-console.log(knightMoves([0, 0], [4, 5]));
+console.log(knightMoves([0, 0], [7, 7]));
